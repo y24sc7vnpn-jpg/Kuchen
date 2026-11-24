@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Der Auxberger Kuchenmarkt – Planspiel vollkommener Markt</title>
+<style>
+:root{
+  --bg:#17122b;--card:#ffffff;--ink:#1c1730;--muted:#6b6584;--line:#e8e4f2;--soft:#f6f3fc;
+  --a1:#c026d3;--a2:#6d28d9;--ok:#15803d;--okbg:#e8f7ee;--bad:#dc2626;--badbg:#fdecec;--warn:#b45309;--warnbg:#fff5e6;
+  --r:18px;--fs:16px;
+}
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body.beamer{--fs:20px}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+  background:radial-gradient(1100px 600px at 0% -10%,#7c3aed66,transparent 60%),radial-gradient(900px 600px at 110% 0%,#db277766,transparent 60%),var(--bg);
+  min-height:100vh;line-height:1.45}
+header{max-width:1200px;margin:0 auto;padding:18px 18px 0;display:flex;gap:14px;align-items:center;flex-wrap:wrap;color:#fff}
+.logo{width:52px;height:52px;border-radius:16px;background:#fff;display:grid;place-items:center;font-size:30px;box-shadow:0 8px 24px #0005}
+.htitle{flex:1;min-width:220px}
+.htitle h1{margin:0;font-size:1.35rem;letter-spacing:-.01em}
+.htitle p{margin:2px 0 0;opacity:.75;font-size:.85rem}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.hbtn{background:#ffffff1f;color:#fff;border:1px solid #ffffff33;border-radius:999px;padding:7px 13px;font:inherit;font-size:.85rem;cursor:pointer}
+.hbtn:hover{background:#ffffff33}
+nav{max-width:1200px;margin:14px auto 0;padding:0 18px;display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:transparent;color:#fff;border:0;border-radius:12px 12px 0 0;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer;opacity:.7}
+nav button.on{background:var(--card);color:var(--ink);opacity:1}
+main{max-width:1200px;margin:0 auto;padding:0 18px 40px}
+.card{background:var(--card);border-radius:0 var(--r) var(--r) var(--r);padding:26px;box-shadow:0 20px 60px #0006}
+.sub{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:16px}
+h2{margin:0 0 6px;font-size:1.7rem;letter-spacing:-.02em}
+h2 .grad,.grad{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+h3{margin:22px 0 10px;font-size:1.15rem}
+p.lead{color:var(--muted);margin:0 0 16px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;border-radius:999px;padding:5px 12px;font-size:.8rem;font-weight:700;margin-bottom:10px}
+.grid{display:grid;gap:12px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.rule{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.rule b{display:block;font-size:.95rem}
+.rule span{color:var(--muted);font-size:.88rem}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted);font-weight:600}
+input,select{font:inherit;color:var(--ink);border:1px solid #d8d2e8;border-radius:10px;padding:8px 10px;background:#fff;min-width:0}
+input:focus,select:focus{outline:3px solid #c026d333;border-color:var(--a1)}
+.chk{display:flex;gap:8px;align-items:center;font-size:.9rem;cursor:pointer}
+.chk input{width:18px;height:18px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:12px 20px;font:inherit;font-weight:700;cursor:pointer;
+  background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;box-shadow:0 8px 20px #6d28d955}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:var(--soft);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.btn.small{padding:7px 12px;font-size:.85rem;border-radius:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.mt{margin-top:18px}
+.firmrow{display:grid;grid-template-columns:auto 1fr 170px;gap:8px;align-items:center;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:middle;flex:none}
+.tag{display:inline-block;font-size:.72rem;background:#ede9fe;color:#5b21b6;border-radius:999px;padding:2px 8px;margin-left:6px;font-weight:600;white-space:nowrap}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+.tbl th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:10px;background:var(--soft);white-space:nowrap}
+.tbl td{padding:10px;border-top:1px solid var(--line);white-space:nowrap}
+.tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl tr.best td{background:#fdf4ff}
+.pos{color:var(--ok);font-weight:700}.neg{color:var(--bad);font-weight:700}
+.stepper{display:inline-flex;align-items:center;border:1px solid #d8d2e8;border-radius:10px;overflow:hidden}
+.stepper button{border:0;background:var(--soft);width:34px;height:38px;font-size:1.1rem;cursor:pointer}
+.stepper input{border:0;border-radius:0;width:56px;text-align:center}
+.hint{font-size:.8rem;color:var(--muted);white-space:normal!important;min-width:200px}
+.hint .w{color:var(--warn);font-weight:600}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.pill{background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;border-radius:999px;padding:6px 13px;font-size:.85rem;font-weight:700}
+.pill.l{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
+.banner{border-radius:14px;padding:14px 16px;margin:10px 0 16px;font-size:.95rem}
+.banner.ok{background:var(--okbg);border:1px solid #bfe7cd}
+.banner.bad{background:var(--badbg);border:1px solid #f6c5c5}
+.banner.warn{background:var(--warnbg);border:1px solid #f7d9a8}
+.sdbar{position:relative;height:30px;border-radius:10px;background:var(--soft);border:1px solid var(--line);overflow:hidden;margin:4px 0}
+.sdbar div{height:100%;border-radius:10px 0 0 10px}
+.sdlab{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+ul.ins{margin:8px 0 0;padding-left:20px}
+ul.ins li{margin:6px 0}
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;flex:1;min-width:120px}
+.progress div{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2))}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;margin:10px 0 20px}
+.pod{width:min(200px,30%);border-radius:16px 16px 6px 6px;color:#fff;text-align:center;padding:14px 8px;box-shadow:0 10px 24px #0002}
+.pod .n{font-size:2.2rem;font-weight:800;line-height:1}
+.pod .nm{font-weight:700;margin-top:6px;font-size:.95rem;word-break:break-word}
+.pod .cap{opacity:.9;font-size:.85rem}
+.p1{background:linear-gradient(180deg,#facc15,#f59e0b);height:190px}
+.p2{background:linear-gradient(180deg,#94a3b8,#64748b);height:150px}
+.p3{background:linear-gradient(180deg,#fb923c,#ea580c);height:125px}
+.chart{width:100%;height:auto;display:block}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:6px}
+.reveal{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s}
+.reveal:hover{border-color:var(--a1)}
+.reveal .q{font-weight:700}
+.reveal .tap{font-size:.8rem;color:var(--muted)}
+.reveal .ans{display:none;margin-top:10px;font-size:.92rem}
+.reveal.open .ans{display:block}
+.reveal.open .tap{display:none}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+.cmp b{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+.mf td,.mf th{text-align:center!important;white-space:normal!important}
+.mf td.hl{background:#fdf4ff;font-weight:700}
+.qopt{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0;font:inherit;cursor:pointer}
+.qopt:hover{border-color:var(--a1)}
+.qopt.right{background:var(--okbg);border-color:#86d3a3}
+.qopt.wrong{background:var(--badbg);border-color:#f3a3a3}
+.qexp{font-size:.9rem;margin-top:6px}
+.kpi{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.kpi span{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.kpi b{font-size:1.35rem}
+.barrow{display:grid;grid-template-columns:60px 1fr 110px;gap:8px;align-items:center;font-size:.85rem;margin:3px 0}
+.barrow .b{height:16px;border-radius:6px}
+.small{font-size:.85rem;color:var(--muted)}
+.masked{color:var(--muted);font-style:italic}
+footer{max-width:1200px;margin:0 auto;padding:0 18px 30px;color:#ffffff88;font-size:.8rem}
+@media (max-width:640px){
+  .card{padding:16px;border-radius:0 0 var(--r) var(--r)}
+  h2{font-size:1.35rem}
+  .firmrow{grid-template-columns:auto 1fr}
+  .firmrow select{grid-column:1/-1}
+  .cmp{grid-template-columns:1fr}
+}
+@media print{body{background:#fff}header .hbtns,nav,footer,.noprint{display:none!important}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🧁</div>
+  <div class="htitle">
+    <h1>Der Auxberger Kuchenmarkt</h1>
+    <p>Planspiel · Marktpreisbildung auf dem vollkommenen Markt</p>
+  </div>
+  <div class="hbtns">
+    <button class="hbtn" data-a="beamer">🔍 Beamer-Modus</button>
+    <button class="hbtn" data-a="fullscreen">⛶ Vollbild</button>
+    <button class="hbtn" data-a="reset">↺ Neues Spiel</button>
+  </div>
+</header>
+<nav id="nav">
+  <button data-tab="spiel">🎲 Spiel</button>
+  <button data-tab="rechner">🧮 Rechner</button>
+  <button data-tab="theorie">📚 Theorie</button>
+  <button data-tab="quiz">✅ Quiz</button>
+</nav>
+<main><div class="card" id="app"></div></main>
+<footer>Läuft komplett offline in einer Datei. Der Spielstand wird automatisch im Browser gespeichert.</footer>
+
+<script>
+"use strict";
+/* ---------- Hilfsfunktionen ---------- */
+const $=s=>document.querySelector(s);
+const fmtN=n=>Math.round(n).toLocaleString('de-DE');
+const fmt=n=>fmtN(n)+' €';
+const sgn=n=>(n>0?'+':n<0?'−':'')+fmtN(Math.abs(n))+' €';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum=a=>a.reduce((s,x)=>s+x,0);
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const COLORS=['#c026d3','#7c3aed','#2563eb','#0891b2','#16a34a','#ca8a04','#ea580c','#dc2626','#db2777','#475569'];
+const NAMES=['Zirbel-Zuckerwerk','Backstube am Perlach','Törtchen-Turm','Kuchenkönige','Sahnehaube','Krümelmonster GmbH','Lech-Leckereien','Fugger-Feingebäck','Plärrer-Plätzchen','Dom-Donuts'];
+const BOT={mensch:'Mensch',vorsichtig:'Computer · vorsichtig',aggressiv:'Computer · aggressiv',nachahmer:'Computer · Nachahmer',zufall:'Computer · zufällig'};
+const SENS={
+  niedrig:{k:1,label:'Niedrig',desc:'Kunden achten wenig auf den Preis. Auch teure Firmen bekommen viele Aufträge.'},
+  mittel:{k:2,label:'Mittel',desc:'Wer billiger ist, bekommt deutlich mehr Aufträge. Teure Firmen bekommen trotzdem einige.'},
+  hoch:{k:4,label:'Hoch',desc:'Schon 1.000 € Unterschied verschieben viele Aufträge.'},
+  perfekt:{k:Infinity,label:'Vollkommen',desc:'Lehrbuch-Fall: Alle kaufen beim Billigsten. Teurere verkaufen nur, wenn die Billigen ausverkauft sind.'}
+};
+const DEF={nFirms:6,rounds:3,start:10000,rent:4000,cost:1000,maxQty:20,minP:1000,maxP:10000,step:1000,
+  volMode:'fest',volFixed:42,volMin:30,volMax:54,sens:'mittel',credit:true,hideVol:false,hideBots:true};
+const SKEY='auxberger-kuchenmarkt-v2';
+
+function defaultSetupFirms(){return NAMES.map((n,i)=>({name:n,type:'mensch',color:COLORS[i]}));}
+function fresh(){return{tab:'spiel',phase:'setup',cfg:{...DEF},setupFirms:defaultSetupFirms(),firms:[],round:1,history:[],pending:null,beamer:false,quiz:{},theory:{}};}
+function load(){try{const s=JSON.parse(localStorage.getItem(SKEY));return s&&s.cfg?s:null;}catch(e){return null;}}
+function save(){try{localStorage.setItem(SKEY,JSON.stringify(S));}catch(e){}}
+let S=load()||fresh();
+
+function prices(){const c=S.cfg,a=[];for(let p=c.minP;p<=c.maxP;p+=c.step)a.push(p);return a;}
+function clampP(p){const c=S.cfg;p=Math.round(p/c.step)*c.step;return Math.min(c.maxP,Math.max(c.minP,p));}
+function maxQ(i){const c=S.cfg;if(c.credit)return c.maxQty;const f=S.firms[i];return Math.max(0,Math.min(c.maxQty,Math.floor((f.capital-c.rent)/c.cost)));}
+function clampQ(q,i){return Math.max(0,Math.min(maxQ(i),Math.round(q||0)));}
+
+/* ---------- Marktmechanik ---------- */
+function allocate(vol,dec,sens,round){
+  const n=dec.length,orders=Array(n).fill(0),spill=Array(n).fill(0),sold=Array(n).fill(0);
+  const act=dec.map((d,i)=>({i,p:d.p,q:d.q})).filter(a=>a.q>0);
+  if(!act.length||vol<=0)return{orders,spill,sold};
+  const rot=i=>(i+round)%n;
+  const minP=Math.min(...act.map(a=>a.p));
+  const k=SENS[sens].k;
+  const w=act.map(a=>k===Infinity?(a.p===minP?1:0):Math.pow(minP/a.p,k));
+  const W=sum(w);
+  const raw=act.map((a,j)=>vol*w[j]/W);
+  const fl=raw.map(Math.floor);
+  let rest=vol-sum(fl);
+  const idx=act.map((a,j)=>j).sort((x,y)=>(raw[y]-fl[y])-(raw[x]-fl[x])||act[x].p-act[y].p||rot(act[x].i)-rot(act[y].i));
+  for(let t=0;rest>0;t=(t+1)%idx.length){fl[idx[t]]++;rest--;}
+  act.forEach((a,j)=>orders[a.i]=fl[j]);
+  let unmet=0;
+  act.forEach(a=>{sold[a.i]=Math.min(orders[a.i],a.q);unmet+=orders[a.i]-sold[a.i];});
+  // Ausweichkäufe: Kunden ohne Ware gehen zum nächstgünstigen Anbieter mit Restbestand
+  while(unmet>0){
+    const cand=act.filter(a=>sold[a.i]<a.q);
+    if(!cand.length)break;
+    const pm=Math.min(...cand.map(a=>a.p));
+    const grp=cand.filter(a=>a.p===pm).sort((x,y)=>rot(x.i)-rot(y.i));
+    let g=0;
+    while(unmet>0){
+      const av=grp.filter(a=>sold[a.i]<a.q);
+      if(!av.length)break;
+      const a=av[g%av.length];sold[a.i]++;spill[a.i]++;unmet--;g++;
+    }
+  }
+  return{orders,spill,sold};
+}
+
+function makeVolume(){
+  const c=S.cfg;
+  if(c.volMode==='zufall')return rnd(Math.min(c.volMin,c.volMax),Math.max(c.volMin,c.volMax));
+  return c.volFixed;
+}
+
+function botDecision(type,i,vol){
+  const c=S.cfg,h=S.history,n=S.firms.length,last=h[h.length-1];
+  const expVol=c.hideVol?(last?last.vol:c.volFixed):vol;
+  const fair=expVol/n;
+  const floorP=Math.max(c.minP,c.cost+c.step);
+  let p,q;
+  switch(type){
+    case'vorsichtig':
+      p=last?Math.ceil(last.avgPrice/c.step)*c.step:4000;q=fair*0.8;break;
+    case'aggressiv':
+      p=last?last.minP-c.step:3000;q=fair*1.5;break;
+    case'nachahmer':
+      if(last){const best=last.res.reduce((b,r,j)=>r.profit>last.res[b].profit?j:b,0);p=last.res[best].p;q=last.res[best].q*(expVol/last.vol);}
+      else{p=4000;q=fair;}
+      break;
+    default:
+      p=rnd(2,6)*1000;q=fair*(0.5+Math.random());
+  }
+  p=Math.max(floorP,clampP(p));
+  return{p:clampP(p),q:clampQ(q,i)};
+}
+
+function prepareRound(){
+  const vol=makeVolume();
+  const last=S.history[S.history.length-1];
+  const decisions=S.firms.map((f,i)=>{
+    if(f.type!=='mensch')return botDecision(f.type,i,vol);
+    if(last){const r=last.res[i];return{p:r.p,q:clampQ(r.q,i)};}
+    return{p:clampP(5000),q:clampQ(10,i)};
+  });
+  S.pending={vol,decisions,revealBots:false};
+}
+
+function evaluate(){
+  const c=S.cfg,P=S.pending;
+  const vol=Math.max(0,Math.round(P.vol));
+  const dec=P.decisions.map((d,i)=>({p:clampP(d.p),q:clampQ(d.q,i)}));
+  const {orders,spill,sold}=allocate(vol,dec,c.sens,S.round);
+  const rankBefore=ranks(S.firms.map(f=>f.capital));
+  const res=dec.map((d,i)=>{
+    const f=S.firms[i],revenue=sold[i]*d.p,costs=c.rent+d.q*c.cost,profit=revenue-costs;
+    return{p:d.p,q:d.q,orders:orders[i],spill:spill[i],sold:sold[i],waste:d.q-sold[i],revenue,costs,profit,capBefore:f.capital,capAfter:f.capital+profit};
+  });
+  res.forEach((r,i)=>S.firms[i].capital=r.capAfter);
+  const supply=sum(res.map(r=>r.q)),soldT=sum(res.map(r=>r.sold)),revT=sum(res.map(r=>r.revenue));
+  const offered=res.filter(r=>r.q>0);
+  const avgPrice=soldT?revT/soldT:(offered.length?sum(offered.map(r=>r.p))/offered.length:0);
+  S.history.push({round:S.round,vol,res,supply,sold:soldT,waste:supply-soldT,unmet:vol-soldT,avgPrice,
+    minP:offered.length?Math.min(...offered.map(r=>r.p)):0,maxP:offered.length?Math.max(...offered.map(r=>r.p)):0,
+    rankBefore,rankAfter:ranks(S.firms.map(f=>f.capital)),decisions:P.decisions.map(d=>({...d})),volInput:P.vol});
+  S.pending=null;S.phase='result';save();render();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function undoRound(){
+  const h=S.history.pop();if(!h)return;
+  h.res.forEach((r,i)=>S.firms[i].capital=r.capBefore);
+  S.round=h.round;S.pending={vol:h.volInput,decisions:h.decisions,revealBots:true};S.phase='input';save();render();
+}
+
+function ranks(caps){const order=caps.map((c,i)=>i).sort((a,b)=>caps[b]-caps[a]);const r=Array(caps.length);order.forEach((i,k)=>r[i]=k+1);return r;}
+
+/* ---------- Ansichten ---------- */
+function rulesHTML(){
+  const c=S.cfg;
+  const vol=c.volMode==='fest'?`${c.volFixed} Kisten je Runde`:c.volMode==='zufall'?`zufällig ${c.volMin}–${c.volMax} Kisten`:'legt die Spielleitung je Runde fest';
+  return `<div class="grid g3">
+    <div class="rule"><b>🏠 Miete</b><span>${fmt(c.rent)} pro Runde, auch ohne Verkauf</span></div>
+    <div class="rule"><b>🥚 Zutaten</b><span>${fmt(c.cost)} je gebackener Kiste</span></div>
+    <div class="rule"><b>📦 Menge</b><span>0 bis ${c.maxQty} Kisten pro Runde</span></div>
+    <div class="rule"><b>🏷️ Preis</b><span>${fmtN(c.minP)} bis ${fmt(c.maxP)} je Kiste, in ${fmtN(c.step)}er-Schritten</span></div>
+    <div class="rule"><b>🗑️ Verderblich</b><span>Was nicht verkauft wird, ist weg</span></div>
+    <div class="rule"><b>💰 Start</b><span>${fmt(c.start)} Kapital für jede Firma</span></div>
+    <div class="rule"><b>👥 Nachfrage</b><span>${vol}</span></div>
+    <div class="rule"><b>⚖️ Preisempfindlichkeit</b><span>${SENS[c.sens].label}: ${SENS[c.sens].desc}</span></div>
+    <div class="rule"><b>🏦 Kredit</b><span>${c.credit?'Erlaubt: Kapital darf ins Minus gehen':'Nicht erlaubt: Backen nur, soweit das Kapital reicht'}</span></div>
+  </div>`;
+}
+
+function vSetup(){
+  const c=S.cfg;
+  const firms=S.setupFirms.slice(0,c.nFirms).map((f,i)=>`
+    <div class="firmrow">
+      <span class="dot" style="background:${f.color}"></span>
+      <input value="${esc(f.name)}" data-f="fname" data-i="${i}" aria-label="Name Firma ${i+1}">
+      <select data-f="ftype" data-i="${i}">${Object.entries(BOT).map(([k,v])=>`<option value="${k}" ${f.type===k?'selected':''}>${k==='mensch'?'👤':'🤖'} ${v}</option>`).join('')}</select>
+    </div>`).join('');
+  const num=(k,label,min,max,step=1,rr=false)=>`<label class="f">${label}<input type="number" min="${min}" max="${max}" step="${step}" value="${c[k]}" data-f="cfg" data-k="${k}" data-num ${rr?'data-rr':''}></label>`;
+  return `<span class="badge">🎲 Planspiel</span>
+  <h2>Der Auxberger <span class="grad">Kuchenmarkt</span></h2>
+  <p class="lead">Ihr leitet eine Konditorei. Ziel: <b>der höchste Kapitalstand nach ${c.rounds} Runden.</b> In jeder Runde entscheidet ihr nur zwei Dinge: <b>Wie viele Kisten backen wir?</b> und <b>Zu welchem Preis bieten wir an?</b></p>
+  <div id="rules">${rulesHTML()}</div>
+  <p class="small mt">Wer billiger ist, bekommt mehr Aufträge. Verkaufen kann man aber nur, was man gebacken hat. Kunden, deren Konditorei ausverkauft ist, weichen zum nächstgünstigen Anbieter aus.</p>
+
+  <h3>⚙️ Einstellungen</h3>
+  <div class="grid g4">
+    <label class="f">Anzahl Firmen<select data-f="cfg" data-k="nFirms" data-num data-rr>${[2,3,4,5,6,7,8,9,10].map(n=>`<option ${n===c.nFirms?'selected':''}>${n}</option>`).join('')}</select></label>
+    <label class="f">Runden<select data-f="cfg" data-k="rounds" data-num data-rr>${[1,2,3,4,5,6,7,8,10].map(n=>`<option ${n===c.rounds?'selected':''}>${n}</option>`).join('')}</select></label>
+    ${num('start','Startkapital (€)',0,1000000,1000)}
+    ${num('rent','Miete je Runde (€)',0,100000,500)}
+    ${num('cost','Zutaten je Kiste (€)',0,100000,500)}
+    ${num('maxQty','Max. Kisten je Runde',1,200)}
+    ${num('minP','Mindestpreis (€)',0,100000,500)}
+    ${num('maxP','Höchstpreis (€)',0,100000,500)}
+    <label class="f">Nachfrage (Marktvolumen)<select data-f="cfg" data-k="volMode" data-rr>
+      <option value="fest" ${c.volMode==='fest'?'selected':''}>Fest</option>
+      <option value="zufall" ${c.volMode==='zufall'?'selected':''}>Zufällig schwankend</option>
+      <option value="manuell" ${c.volMode==='manuell'?'selected':''}>Je Runde eingeben</option></select></label>
+    ${c.volMode==='zufall'?num('volMin','Volumen von',0,1000)+num('volMax','Volumen bis',0,1000):num('volFixed',c.volMode==='manuell'?'Vorschlag Volumen':'Kisten je Runde',0,1000)}
+    <label class="f">Preisempfindlichkeit der Kunden<select data-f="cfg" data-k="sens">${Object.entries(SENS).map(([k,v])=>`<option value="${k}" ${c.sens===k?'selected':''}>${v.label}</option>`).join('')}</select></label>
+  </div>
+  <div class="row mt">
+    <label class="chk"><input type="checkbox" data-f="cfg" data-k="credit" ${c.credit?'checked':''}> Kredit erlaubt (Kapital darf negativ werden)</label>
+    <label class="chk"><input type="checkbox" data-f="cfg" data-k="hideVol" ${c.hideVol?'checked':''}> Marktvolumen erst nach der Runde zeigen</label>
+  </div>
+
+  <h3>🏪 Firmen</h3>
+  <p class="small">Tipp: Stellt einzelne Firmen auf „Computer“, dann könnt ihr auch zu zweit oder allein gegen den Rechner spielen.</p>
+  <div class="grid g3">${firms}</div>
+  <div class="row mt"><button class="btn" data-a="start">Spiel starten ›</button><button class="btn ghost small" data-a="allhuman">Alle auf Mensch</button><button class="btn ghost small" data-a="mixbots">Gemischt mit Computer</button></div>`;
+}
+
+function hint(i){
+  const c=S.cfg,d=S.pending.decisions[i],mq=maxQ(i);
+  if(!d.q)return `Backt nichts: Die Miete fällt trotzdem an (<span class="neg">−${fmt(c.rent)}</span>)`;
+  const costs=c.rent+d.q*c.cost,db=d.p-c.cost,be=db>0?Math.ceil(c.rent/db):Infinity;
+  const beTotal=Math.ceil(costs/d.p);
+  let h=`Kosten ${fmt(costs)} · Plus ab <b>${beTotal}</b> verkauften Kisten · max. Gewinn <span class="${d.q*d.p-costs>=0?'pos':'neg'}">${sgn(d.q*d.p-costs)}</span>`;
+  if(db<=0)h+=`<br><span class="w">⚠️ Preis deckt nicht einmal die Zutaten</span>`;
+  else if(beTotal>d.q)h+=`<br><span class="w">⚠️ Selbst ausverkauft gibt es Verlust</span>`;
+  if(!c.credit&&d.q>=mq)h+=`<br><span class="w">Kapitalgrenze erreicht (max. ${mq})</span>`;
+  return h;
+}
+
+function vInput(){
+  const c=S.cfg,P=S.pending,last=S.history[S.history.length-1];
+  const pOpts=p=>prices().map(x=>`<option value="${x}" ${x===p?'selected':''}>${fmtN(x)} €</option>`).join('');
+  const rows=S.firms.map((f,i)=>{
+    const d=P.decisions[i],bot=f.type!=='mensch',hidden=bot&&c.hideBots&&!P.revealBots;
+    return `<tr>
+      <td><span class="dot" style="background:${f.color}"></span><b>${esc(f.name)}</b>${bot?`<span class="tag">🤖 ${BOT[f.type].replace('Computer · ','')}</span>`:''}</td>
+      <td class="num">${fmt(f.capital)}</td>
+      ${hidden?`<td class="masked" colspan="3">🤖 entscheidet verdeckt …</td>`:`
+      <td><select data-f="price" data-i="${i}">${pOpts(d.p)}</select></td>
+      <td><div class="stepper"><button data-a="qm" data-i="${i}" aria-label="weniger">−</button><input type="number" min="0" max="${maxQ(i)}" value="${d.q}" data-f="qty" data-i="${i}"><button data-a="qp" data-i="${i}" aria-label="mehr">+</button></div></td>
+      <td class="hint" id="hint${i}">${hint(i)}</td>`}
+    </tr>`;}).join('');
+  const hasBots=S.firms.some(f=>f.type!=='mensch');
+  const volHTML=c.volMode==='manuell'
+    ?`<label class="f" style="max-width:220px">Marktvolumen dieser Runde<input type="number" min="0" value="${P.vol}" data-f="vol"></label>`
+    :c.hideVol?`<span class="pill l">👥 Marktvolumen: verdeckt 🙈</span>`:`<span class="pill">👥 Marktvolumen dieser Runde: ${P.vol} Kisten</span>`;
+  return `<div class="row"><span class="badge" style="margin:0">Runde ${S.round} von ${c.rounds}</span><div class="progress"><div style="width:${(S.round-1)/c.rounds*100}%"></div></div></div>
+  <h2 class="mt">Entscheidungen der Firmen</h2>
+  <p class="lead">Preis und gebackene Kisten von den Entscheidungskarten eintragen.${last?` Letzte Runde: Ø Preis ${fmt(last.avgPrice)}, ${last.unmet>0?`<b>${last.unmet} Kisten fehlten</b>`:last.waste>0?`<b>${last.waste} Kisten verdorben</b>`:'Markt genau geräumt'}.`:''}</p>
+  <div class="row" style="margin-bottom:12px">${volHTML}<span class="spacer"></span>
+    ${hasBots?`<label class="chk"><input type="checkbox" data-f="cfg" data-k="hideBots" data-rr ${c.hideBots?'checked':''}> Computer-Entscheidungen verdecken</label>`:''}</div>
+  <div class="tblwrap"><table class="tbl">
+    <thead><tr><th>Firma</th><th class="num">Kapital</th><th>Preis je Kiste</th><th>Gebackene Kisten</th><th>Vorschau</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+  <div class="row mt"><button class="btn" data-a="evaluate">Runde auswerten ›</button>
+  ${S.round===1&&!S.history.length?`<button class="btn ghost" data-a="tosetup">‹ Zurück zu den Einstellungen</button>`:''}</div>`;
+}
+
+function marketState(h){
+  if(h.supply<h.vol)return{cls:'ok',t:`📈 <b>Nachfrageüberhang (Verkäufermarkt):</b> Gebacken wurden ${h.supply} Kisten, gekauft hätten die Kunden ${h.vol}. <b>${h.vol-h.supply} Kisten fehlten.</b> Wer Ware hatte, wurde sie los. Hier zählt die <b>Menge</b> mehr als der Preis, und die Preise können steigen.`};
+  if(h.supply>h.vol)return{cls:'bad',t:`📉 <b>Angebotsüberhang (Käufermarkt):</b> Gebacken wurden ${h.supply} Kisten bei ${h.vol} Kisten Nachfrage. <b>${h.waste} Kisten verdorben</b> (${fmt(h.waste*S.cfg.cost)} Zutaten im Müll). Hier entscheidet der <b>Preis</b>, und die Preise geraten unter Druck.`};
+  return{cls:'warn',t:`⚖️ <b>Gleichgewicht:</b> Angebot und Nachfrage waren genau gleich (${h.vol} Kisten). Der Markt wurde geräumt.`};
+}
+
+function roundInsights(h){
+  const prev=S.history[S.history.indexOf(h)-1],F=S.firms,out=[];
+  const bi=h.res.reduce((b,r,j)=>r.profit>h.res[b].profit?j:b,0),b=h.res[bi];
+  out.push(`🏅 Bester Gewinn: <b>${esc(F[bi].name)}</b> mit ${sgn(b.profit)} (${fmt(b.p)}, ${b.q} gebacken, ${b.sold} verkauft).`);
+  if(prev){const d=h.avgPrice-prev.avgPrice;out.push(`💶 Ø Marktpreis: ${fmt(prev.avgPrice)} → <b>${fmt(h.avgPrice)}</b> (${d>0?'gestiegen':d<0?'gefallen':'gleich'}${d?` um ${fmt(Math.abs(d))}`:''}).`);}
+  const sp=h.res.map((r,j)=>[r,j]).filter(([r])=>r.spill>0);
+  if(sp.length)out.push(`🔀 Ausweichkäufe: ${sp.map(([r,j])=>`${esc(F[j].name)} +${r.spill}`).join(', ')}. Diese Kunden fanden beim Billigeren keine Ware mehr.`);
+  const loss=h.res.filter(r=>r.profit<0).length;
+  if(loss)out.push(`⚠️ ${loss} von ${F.length} Firmen machten Verlust.`);
+  const ww=h.res.map((r,j)=>[r,j]).filter(([r])=>r.waste>0).sort((a,b)=>b[0].waste-a[0].waste)[0];
+  if(ww)out.push(`🗑️ Am meisten weggeworfen: ${esc(F[ww[1]].name)} (${ww[0].waste} Kisten = ${fmt(ww[0].waste*S.cfg.cost)}).`);
+  const cheap=h.res.filter(r=>r.q>0&&r.p===h.minP);
+  if(cheap.length&&h.minP-S.cfg.cost<=0)out.push(`🚫 Ein Preis von ${fmt(h.minP)} deckt nicht einmal die Zutaten. Jede verkaufte Kiste bringt dort keinen Deckungsbeitrag.`);
+  return out;
+}
+
+function vResult(){
+  const c=S.cfg,h=S.history[S.history.length-1],F=S.firms,ms=marketState(h);
+  const bi=h.res.reduce((b,r,j)=>r.capAfter>h.res[b].capAfter?j:b,0);
+  const rows=h.res.map((r,i)=>{
+    const dr=h.rankBefore[i]-h.rankAfter[i];
+    return `<tr class="${i===bi?'best':''}">
+      <td><span class="dot" style="background:${F[i].color}"></span><b>${esc(F[i].name)}</b></td>
+      <td class="num">${fmt(r.p)}</td><td class="num">${r.q}</td><td class="num">${r.orders}</td>
+      <td class="num">${r.spill?'+'+r.spill:'–'}</td><td class="num"><b>${r.sold}</b></td>
+      <td class="num">${r.waste||'–'}</td><td class="num">${fmt(r.revenue)}</td><td class="num">${fmt(r.costs)}</td>
+      <td class="num ${r.profit>=0?'pos':'neg'}">${sgn(r.profit)}</td><td class="num"><b>${fmt(r.capAfter)}</b></td>
+      <td class="num">${h.rankAfter[i]}. ${dr>0?'<span class="pos">▲</span>':dr<0?'<span class="neg">▼</span>':''}</td></tr>`;}).join('');
+  const maxv=Math.max(h.vol,h.supply,1);
+  const lastRound=S.round>=c.rounds;
+  return `<div class="row"><span class="badge" style="margin:0">Runde ${S.round} von ${c.rounds}</span><div class="progress"><div style="width:${S.round/c.rounds*100}%"></div></div></div>
+  <h2 class="mt">Ergebnis der Runde</h2>
+  <div class="pills"><span class="pill">👥 Marktvolumen ${h.vol} Kisten</span><span class="pill">🧁 gebacken ${h.supply}</span><span class="pill">✅ verkauft ${h.sold}</span><span class="pill">Ø Preis ${fmt(h.avgPrice)}</span><span class="pill">🗑️ weggeworfen ${h.waste}</span>${h.unmet>0?`<span class="pill">😕 leer ausgegangen ${h.unmet}</span>`:''}</div>
+  <div>
+    <div class="sdlab"><span>Nachfrage</span><span>${h.vol} Kisten</span></div><div class="sdbar"><div style="width:${h.vol/maxv*100}%;background:#6d28d9"></div></div>
+    <div class="sdlab"><span>Angebot (gebacken)</span><span>${h.supply} Kisten</span></div><div class="sdbar"><div style="width:${h.supply/maxv*100}%;background:#c026d3"></div></div>
+  </div>
+  <div class="banner ${ms.cls}">${ms.t}</div>
+  <div class="tblwrap"><table class="tbl">
+    <thead><tr><th>Firma</th><th class="num">Preis</th><th class="num">Gebacken</th><th class="num">Aufträge</th><th class="num">Ausweich</th><th class="num">Verkauft</th><th class="num">Weg</th><th class="num">Umsatz</th><th class="num">Kosten</th><th class="num">Gewinn/Verlust</th><th class="num">Kapital</th><th class="num">Platz</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+  <h3>🔎 Was ist passiert?</h3>
+  <ul class="ins">${roundInsights(h).map(x=>`<li>${x}</li>`).join('')}</ul>
+  <div class="row mt noprint">
+    <button class="btn" data-a="next">${lastRound?'Zum Endstand 🏆':'Nächste Runde ›'}</button>
+    <button class="btn ghost" data-a="undo">‹ Eingaben korrigieren</button></div>`;
+}
+
+function gameInsights(){
+  const H=S.history,F=S.firms,c=S.cfg,out=[];
+  out.push(`💶 Marktpreis-Verlauf: ${H.map(h=>fmt(h.avgPrice)).join(' → ')}.`);
+  const under=H.filter(h=>h.supply<h.vol).length,over=H.filter(h=>h.supply>h.vol).length;
+  out.push(`📊 ${under} Runde(n) mit Nachfrageüberhang, ${over} Runde(n) mit Angebotsüberhang.`);
+  const waste=sum(H.map(h=>h.waste));
+  if(waste)out.push(`🗑️ Insgesamt ${waste} Kisten verdorben, das sind ${fmt(waste*c.cost)} verschwendete Zutaten.`);
+  const prof=H.map(h=>sum(h.res.map(r=>r.profit)));
+  out.push(`🏭 Gewinn der ganzen Branche je Runde: ${prof.map(sgn).join(' → ')}.`);
+  const st=F.map((f,i)=>({i,sold:sum(H.map(h=>h.res[i].sold)),rev:sum(H.map(h=>h.res[i].revenue))})).map(s=>({...s,avg:s.sold?s.rev/s.sold:0}));
+  const w=F.map((f,i)=>i).sort((a,b)=>F[b].capital-F[a].capital)[0];
+  const mostSold=[...st].sort((a,b)=>b.sold-a.sold)[0],dearest=[...st].filter(s=>s.sold).sort((a,b)=>b.avg-a.avg)[0];
+  out.push(`🏆 Sieger <b>${esc(F[w].name)}</b>: ${st[w].sold} Kisten verkauft zu Ø ${fmt(st[w].avg)}.`);
+  if(dearest&&dearest.i!==w)out.push(`🤔 Den höchsten Ø Preis hatte ${esc(F[dearest.i].name)} (${fmt(dearest.avg)}), aber nur Platz ${ranks(F.map(f=>f.capital))[dearest.i]}. Ein hoher Preis allein reicht nicht, es kommt auf <b>Preis × Menge − Kosten</b> an.`);
+  if(mostSold.i===w)out.push(`📦 Der Sieger hat auch die meisten Kisten verkauft: Auf diesem Markt zahlt sich ein günstiger Preis mit passender Menge aus.`);
+  const firstP=H[0].avgPrice,lastP=H[H.length-1].avgPrice;
+  if(H.length>1&&lastP<firstP)out.push(`📉 Der Preis ist gefallen. Genau das erwartet die Theorie für den vollkommenen Markt: Wettbewerb drückt den Preis Richtung Kosten.`);
+  return out;
+}
+
+function vFinal(){
+  const F=S.firms,H=S.history,c=S.cfg;
+  const order=F.map((f,i)=>i).sort((a,b)=>F[b].capital-F[a].capital);
+  const pod=(k,cls)=>order[k]!==undefined?`<div class="pod ${cls}"><div class="n">${k+1}</div><div class="nm">${esc(F[order[k]].name)}</div><div class="cap">${fmt(F[order[k]].capital)}</div></div>`:'';
+  const rows=order.map((i,k)=>{
+    const sold=sum(H.map(h=>h.res[i].sold)),rev=sum(H.map(h=>h.res[i].revenue)),waste=sum(H.map(h=>h.res[i].waste)),pr=sum(H.map(h=>h.res[i].profit));
+    return `<tr class="${k===0?'best':''}"><td>${k+1}.</td><td><span class="dot" style="background:${F[i].color}"></span><b>${esc(F[i].name)}</b></td>
+    <td class="num"><b>${fmt(F[i].capital)}</b></td><td class="num ${pr>=0?'pos':'neg'}">${sgn(pr)}</td><td class="num">${sold}</td><td class="num">${waste}</td><td class="num">${sold?fmt(rev/sold):'–'}</td></tr>`;}).join('');
+  const labels=H.map(h=>'R'+h.round);
+  const priceChart=lineChart({labels,series:[
+    {name:'Ø Marktpreis',color:'#c026d3',values:H.map(h=>h.avgPrice),w:4},
+    {name:'Höchster Angebotspreis',color:'#a78bfa',values:H.map(h=>h.maxP),dash:'6 5'},
+    {name:'Niedrigster Angebotspreis',color:'#f472b6',values:H.map(h=>h.minP),dash:'6 5'},
+    {name:'Zutatenkosten je Kiste',color:'#94a3b8',values:H.map(()=>c.cost),dash:'2 4'}]});
+  const capChart=lineChart({labels:['Start',...labels],series:F.map((f,i)=>({name:f.name,color:f.color,values:[c.start,...H.map(h=>h.res[i].capAfter)]}))});
+  const sdChart=barChart({labels,series:[{name:'Nachfrage',color:'#6d28d9',values:H.map(h=>h.vol)},{name:'Angebot',color:'#c026d3',values:H.map(h=>h.supply)},{name:'Verkauft',color:'#16a34a',values:H.map(h=>h.sold)}]});
+  return `<span class="badge">🏆 Endstand</span>
+  <h2>Wer backt am <span class="grad">erfolgreichsten?</span></h2>
+  <div class="podium">${pod(1,'p2')}${pod(0,'p1')}${pod(2,'p3')}</div>
+  <div class="tblwrap"><table class="tbl"><thead><tr><th>Platz</th><th>Firma</th><th class="num">Kapital</th><th class="num">Gesamtgewinn</th><th class="num">Verkaufte Kisten</th><th class="num">Weggeworfen</th><th class="num">Ø Preis</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <h3>💶 Wie hat sich der Marktpreis entwickelt?</h3><div class="sub">${priceChart}</div>
+  <h3>📦 Angebot und Nachfrage je Runde</h3><div class="sub">${sdChart}</div>
+  <h3>💰 Kapitalverlauf</h3><div class="sub">${capChart}</div>
+  <h3>🔎 Erkenntnisse aus eurem Spiel</h3>
+  <ul class="ins">${gameInsights().map(x=>`<li>${x}</li>`).join('')}</ul>
+  <div class="row mt noprint">
+    <button class="btn" data-tab="theorie">Vom Spiel zur Theorie ›</button>
+    <button class="btn ghost" data-a="csv">⬇️ Ergebnisse als CSV</button>
+    <button class="btn ghost" data-a="print">🖨️ Drucken / PDF</button>
+    <button class="btn ghost" data-a="replay">↻ Gleiche Einstellungen, neues Spiel</button>
+    <button class="btn ghost" data-a="undo">‹ Letzte Runde korrigieren</button></div>`;
+}
+
+/* ---------- Diagramme (SVG) ---------- */
+function niceStep(range){const raw=range/4,mag=Math.pow(10,Math.floor(Math.log10(raw||1))),n=raw/mag;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*mag;}
+function axis(all){
+  let lo=Math.min(0,...all),hi=Math.max(1,...all);const st=niceStep(hi-lo);
+  lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi===lo)hi=lo+st;
+  const ticks=[];for(let v=lo;v<=hi+1e-9;v+=st)ticks.push(v);return{lo,hi,ticks};
+}
+const shortN=v=>Math.abs(v)>=1000?(v/1000).toLocaleString('de-DE')+' T':v.toLocaleString('de-DE');
+function lineChart({labels,series}){
+  const W=680,H=280,pl=54,pr=16,pt=14,pb=30;
+  const {lo,hi,ticks}=axis(series.flatMap(s=>s.values));
+  const x=i=>labels.length<2?pl+(W-pl-pr)/2:pl+i*(W-pl-pr)/(labels.length-1);
+  const y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo));
+  let g=ticks.map(t=>`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="${t===0?'#b8b0cc':'#ece8f4'}"/><text x="${pl-8}" y="${y(t)+4}" font-size="11" text-anchor="end" fill="#6b6584">${shortN(t)}</text>`).join('');
+  g+=labels.map((l,i)=>`<text x="${x(i)}" y="${H-8}" font-size="12" text-anchor="middle" fill="#6b6584">${esc(l)}</text>`).join('');
+  const lines=series.map(s=>{
+    const pts=s.values.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+    return `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="${s.w||2.5}" stroke-linejoin="round" stroke-linecap="round" ${s.dash?`stroke-dasharray="${s.dash}"`:''}/>`+
+      (s.dash?'':s.values.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="#fff" stroke="${s.color}" stroke-width="2.5"><title>${esc(s.name)}: ${fmt(v)}</title></circle>`).join(''));
+  }).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">${g}${lines}</svg>`+legend(series);
+}
+function barChart({labels,series}){
+  const W=680,H=260,pl=44,pr=16,pt=14,pb=30;
+  const {lo,hi,ticks}=axis(series.flatMap(s=>s.values));
+  const y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo));
+  const gw=(W-pl-pr)/labels.length,bw=Math.min(36,gw*0.8/series.length);
+  let g=ticks.map(t=>`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="#ece8f4"/><text x="${pl-8}" y="${y(t)+4}" font-size="11" text-anchor="end" fill="#6b6584">${t}</text>`).join('');
+  labels.forEach((l,i)=>{
+    const cx=pl+gw*i+gw/2,x0=cx-bw*series.length/2;
+    series.forEach((s,k)=>{const v=s.values[i];g+=`<rect x="${x0+k*bw+1}" y="${y(v)}" width="${bw-2}" height="${Math.max(0,y(0)-y(v))}" rx="4" fill="${s.color}"><title>${esc(s.name)}: ${v}</title></rect><text x="${x0+k*bw+bw/2}" y="${y(v)-4}" font-size="10" text-anchor="middle" fill="#6b6584">${v}</text>`;});
+    g+=`<text x="${cx}" y="${H-8}" font-size="12" text-anchor="middle" fill="#6b6584">${esc(l)}</text>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">${g}</svg>`+legend(series);
+}
+function legend(series){return `<div class="legend">${series.map(s=>`<span><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('')}</div>`;}
+
+/* ---------- Rechner ---------- */
+function vCalc(){
+  const c=S.cfg,cs=S.calc||(S.calc={p:3000,q:10,s:8});
+  return `<span class="badge">🧮 Rechner</span>
+  <h2>Lohnt sich unsere <span class="grad">Entscheidung?</span></h2>
+  <p class="lead">Preis und Menge eintragen und schauen, ab wie vielen verkauften Kisten ihr im Plus seid. Grundlage sind die aktuellen Spielregeln (Miete ${fmt(c.rent)}, Zutaten ${fmt(c.cost)} je Kiste).</p>
+  <div class="grid g3">
+    <label class="f">Preis je Kiste<select data-f="calc" data-k="p">${prices().map(p=>`<option value="${p}" ${p===cs.p?'selected':''}>${fmtN(p)} €</option>`).join('')}</select></label>
+    <label class="f">Gebackene Kisten<input type="number" min="0" max="${c.maxQty}" value="${cs.q}" data-f="calc" data-k="q"></label>
+    <label class="f">Davon verkauft: <b id="csl">${cs.s}</b><input type="range" min="0" max="${cs.q}" value="${Math.min(cs.s,cs.q)}" data-f="calc" data-k="s" id="crange"></label>
+  </div>
+  <div id="calcout" class="mt"></div>`;
+}
+function calcUpdate(){
+  const c=S.cfg,cs=S.calc;cs.s=Math.min(cs.s,cs.q);
+  const costs=c.rent+cs.q*c.cost,rev=cs.s*cs.p,pr=rev-costs,db=cs.p-c.cost,be=Math.ceil(costs/cs.p);
+  const r=$('#crange');if(r){r.max=cs.q;r.value=cs.s;}const l=$('#csl');if(l)l.textContent=cs.s;
+  let bars='';const maxAbs=Math.max(Math.abs(c.rent+cs.q*c.cost),cs.q*cs.p-costs,1);
+  for(let s=0;s<=cs.q;s++){const v=s*cs.p-costs;bars+=`<div class="barrow"><span>${s} verk.</span><div><div class="b" style="width:${Math.abs(v)/maxAbs*100}%;background:${v>=0?'#16a34a':'#dc2626'};${s===cs.s?'outline:3px solid #c026d355':''}"></div></div><span class="num ${v>=0?'pos':'neg'}" style="text-align:right">${sgn(v)}</span></div>`;}
+  $('#calcout').innerHTML=`<div class="grid g4">
+    <div class="kpi"><span>Kosten gesamt</span><b>${fmt(costs)}</b><div class="small">${fmt(c.rent)} Miete + ${cs.q} × ${fmt(c.cost)}</div></div>
+    <div class="kpi"><span>Umsatz</span><b>${fmt(rev)}</b><div class="small">${cs.s} × ${fmt(cs.p)}</div></div>
+    <div class="kpi"><span>Gewinn / Verlust</span><b class="${pr>=0?'pos':'neg'}">${sgn(pr)}</b><div class="small">${cs.q-cs.s} Kisten verdorben</div></div>
+    <div class="kpi"><span>Deckungsbeitrag je Kiste</span><b>${fmt(db)}</b><div class="small">Preis − Zutaten</div></div>
+    <div class="kpi"><span>Plus ab</span><b>${be>cs.q?'nie':be+' Kisten'}</b><div class="small">${be>cs.q?'selbst ausverkauft Verlust':`von ${cs.q} gebackenen`}</div></div>
+  </div><h3>Gewinn je nach Verkaufsmenge</h3><div class="sub">${bars}</div>`;
+}
+
+/* ---------- Theorie ---------- */
+const MERKMALE=[
+  ['Gleichartige (homogene) Güter','Alle Kisten waren völlig gleich. Kein Kuchen war besser als ein anderer.','Kuchen unterscheiden sich in Geschmack, Qualität, Verpackung und Marke. Gleiche Produkte gibt es fast nur bei Rohstoffen wie Strom, Heizöl oder Weizen.'],
+  ['Keine Präferenzen','Kunden haben nur auf den Preis geachtet. Es gab keine Stammkunden.','Es gibt sachliche (Qualität), persönliche (nette Verkäuferin), räumliche (Bäcker um die Ecke) und zeitliche (Öffnungszeiten) Vorlieben.'],
+  ['Markttransparenz','Alle Preise standen für jeden sichtbar am Beamer.','Preise vergleichen kostet Zeit und Mühe. Kaum jemand kennt alle Angebote. Vergleichsportale machen Märkte etwas transparenter.'],
+  ['Unendlich schnelle Reaktion','Kunden sind sofort zur billigeren Konditorei gewechselt, ohne Weg und Wartezeit.','Gewohnheit, Wege, Verträge und Trägheit verzögern den Wechsel. Anbieter können ihre Produktion nicht sofort umstellen.'],
+  ['Viele Anbieter und viele Nachfrager (Polypol)','Kein Kunde und keine Firma konnte den Preis allein bestimmen.','Mit nur 6 Firmen war unser Spiel eigentlich nahe an einem Angebotsoligopol. Echte Polypole sind z. B. Wochenmärkte oder die Börse.']
+];
+function vTheory(){
+  const H=S.history,T=S.theory||(S.theory={});
+  const cards=MERKMALE.map((m,i)=>`<div class="reveal ${T[i]?'open':''}" data-a="reveal" data-i="${i}">
+    <div class="q">${i+1}. ${m[0]}</div><div class="tap">antippen zum Aufdecken</div>
+    <div class="ans"><div class="cmp"><div><b>🎲 Im Spiel</b>${m[1]}</div><div><b>🌍 In Wirklichkeit</b>${m[2]}</div></div></div></div>`).join('');
+  const game=H.length?`<div class="banner warn">🎲 <b>In eurem Spiel:</b> ${H.map(h=>`Runde ${h.round}: ${h.supply<h.vol?`Nachfrageüberhang (${h.vol-h.supply} fehlten)`:h.supply>h.vol?`Angebotsüberhang (${h.waste} verdorben)`:'Gleichgewicht'}, Ø ${fmt(h.avgPrice)}`).join(' · ')}</div>`:'';
+  return `<span class="badge">📚 Vom Spiel zur Theorie</span>
+  <h2>Was war im Spiel <span class="grad">einfacher als in Wirklichkeit?</span></h2>
+  <p class="lead">Erst überlegen, dann antippen. Ein Markt, auf dem alle fünf Bedingungen gelten, heißt <b>vollkommener Markt</b>.</p>
+  <div class="grid">${cards}</div>
+  <div class="row mt"><button class="btn ghost small" data-a="revealall">Alle aufdecken</button><button class="btn ghost small" data-a="hideall">Alle verdecken</button></div>
+
+  <h3>⚖️ Preisbildung: Angebot trifft Nachfrage</h3>
+  <div class="grid g3">
+    <div class="sub">${sdCross()}</div>
+    <div class="sub">
+      <p><b>Angebotsüberhang</b> (Preis über dem Gleichgewicht): Es wird mehr angeboten als gekauft. Die Anbieter senken die Preise.</p>
+      <p><b>Nachfrageüberhang</b> (Preis unter dem Gleichgewicht): Es wird mehr gewünscht als angeboten. Die Preise steigen.</p>
+      <p><b>Gleichgewichtspreis:</b> Hier stimmen angebotene und nachgefragte Menge überein. Der Markt wird <b>geräumt</b>, und es wird die größtmögliche Menge umgesetzt.</p>
+    </div>
+  </div>
+  ${game}
+  <h3>📌 Folgen des vollkommenen Markts</h3>
+  <ul class="ins">
+    <li><b>Einheitlicher Preis</b> (Gesetz der Unterschiedslosigkeit der Preise): Für ein homogenes Gut kann es nur einen Preis geben. Wer teurer ist, verkauft nichts.</li>
+    <li><b>Anbieter als Mengenanpasser:</b> Eine einzelne Firma kann den Marktpreis nicht beeinflussen. Sie entscheidet nur, wie viel sie zu diesem Preis anbietet.</li>
+    <li><b>Wettbewerb drückt den Preis</b> Richtung Kosten. Langfristig bleibt kaum Gewinn.</li>
+    <li>Der vollkommene Markt ist ein <b>Modell</b>. Er hilft, Preisbildung zu verstehen, existiert in reiner Form aber praktisch nicht. Am nächsten kommt ihm die <b>Börse</b>.</li>
+  </ul>
+
+  <h3>🏛️ Marktformen (nach Zahl der Anbieter und Nachfrager)</h3>
+  <div class="tblwrap"><table class="tbl mf"><thead><tr><th>Nachfrager ↓ / Anbieter →</th><th>viele</th><th>wenige</th><th>einer</th></tr></thead><tbody>
+    <tr><th>viele</th><td class="hl">Polypol<br><span class="small">Wochenmarkt, Börse</span></td><td>Angebotsoligopol<br><span class="small">Mineralöl, Mobilfunk</span></td><td>Angebotsmonopol<br><span class="small">Deutsche Bahn (Schiene)</span></td></tr>
+    <tr><th>wenige</th><td>Nachfrageoligopol<br><span class="small">Molkereien kaufen Milch</span></td><td>zweiseitiges Oligopol<br><span class="small">Autohersteller und Zulieferer</span></td><td>beschränktes Angebotsmonopol</td></tr>
+    <tr><th>einer</th><td>Nachfragemonopol<br><span class="small">Bundeswehr (Panzer)</span></td><td>beschränktes Nachfragemonopol</td><td>zweiseitiges Monopol</td></tr>
+  </tbody></table></div>
+
+  <h3>📖 Begriffe aus dem Spiel</h3>
+  <div class="grid g3">
+    <div class="rule"><b>Fixkosten</b><span>Fallen immer an, egal wie viel produziert wird. Im Spiel: die Miete (${fmt(S.cfg.rent)}).</span></div>
+    <div class="rule"><b>Variable Kosten</b><span>Steigen mit der Menge. Im Spiel: Zutaten (${fmt(S.cfg.cost)} je Kiste).</span></div>
+    <div class="rule"><b>Deckungsbeitrag</b><span>Preis − variable Kosten je Stück. Er „deckt“ die Fixkosten. Bei 3.000 €: ${fmt(3000-S.cfg.cost)}.</span></div>
+    <div class="rule"><b>Gewinnschwelle (Break-even)</b><span>Fixkosten ÷ Deckungsbeitrag. Bei 3.000 €: ${Math.ceil(S.cfg.rent/Math.max(1,3000-S.cfg.cost))} Kisten.</span></div>
+    <div class="rule"><b>Umsatz</b><span>Verkaufte Menge × Preis</span></div>
+    <div class="rule"><b>Gewinn</b><span>Umsatz − Gesamtkosten (Fixkosten + variable Kosten)</span></div>
+  </div>
+  <div class="row mt noprint"><button class="btn" data-tab="quiz">Jetzt testen: Quiz ›</button></div>`;
+}
+function sdCross(){
+  return `<svg class="chart" viewBox="0 0 320 240" role="img" aria-label="Angebot und Nachfrage">
+    <line x1="40" y1="200" x2="300" y2="200" stroke="#1c1730" stroke-width="1.5"/><line x1="40" y1="200" x2="40" y2="20" stroke="#1c1730" stroke-width="1.5"/>
+    <text x="300" y="218" font-size="12" text-anchor="end" fill="#6b6584">Menge</text><text x="34" y="22" font-size="12" text-anchor="end" fill="#6b6584">Preis</text>
+    <rect x="40" y="55" width="260" height="55" fill="#fdecec"/><text x="295" y="72" font-size="10" text-anchor="end" fill="#b91c1c">Angebotsüberhang</text>
+    <rect x="40" y="110" width="260" height="60" fill="#e8f7ee"/><text x="295" y="164" font-size="10" text-anchor="end" fill="#15803d">Nachfrageüberhang</text>
+    <line x1="60" y1="185" x2="280" y2="40" stroke="#c026d3" stroke-width="3"/><text x="282" y="38" font-size="12" fill="#c026d3" font-weight="700">A</text>
+    <line x1="60" y1="40" x2="280" y2="185" stroke="#6d28d9" stroke-width="3"/><text x="282" y="196" font-size="12" fill="#6d28d9" font-weight="700">N</text>
+    <circle cx="170" cy="112.5" r="6" fill="#facc15" stroke="#1c1730"/>
+    <line x1="40" y1="112.5" x2="170" y2="112.5" stroke="#1c1730" stroke-dasharray="4 4"/><line x1="170" y1="112.5" x2="170" y2="200" stroke="#1c1730" stroke-dasharray="4 4"/>
+    <text x="44" y="106" font-size="11" fill="#1c1730" font-weight="700">Gleichgewichtspreis</text><text x="170" y="214" font-size="11" text-anchor="middle" fill="#1c1730" font-weight="700">Gleichgewichtsmenge</text>
+  </svg>`;
+}
+
+/* ---------- Quiz ---------- */
+const QUIZ=[
+  ['Welche Kosten fallen auch an, wenn ihr keine einzige Kiste backt?',['Zutaten','Miete','Umsatz','Gar keine'],1,'Die Miete gehört zu den Fixkosten. Sie hängt nicht von der Menge ab.'],
+  ['Preis 3.000 €, Zutaten 1.000 € je Kiste. Wie hoch ist der Deckungsbeitrag je Kiste?',['1.000 €','2.000 €','3.000 €','4.000 €'],1,'Deckungsbeitrag = Preis − variable Kosten = 3.000 € − 1.000 € = 2.000 €.'],
+  ['Miete 4.000 €, Preis 3.000 €, Zutaten 1.000 €. Ab wie vielen verkauften Kisten ist die Miete gedeckt (ohne Reste)?',['1','2','4','6'],1,'Fixkosten ÷ Deckungsbeitrag = 4.000 € ÷ 2.000 € = 2 Kisten.'],
+  ['Welches Merkmal gehört NICHT zum vollkommenen Markt?',['Homogene Güter','Markttransparenz','Stammkunden, die immer beim selben Bäcker kaufen','Unendlich schnelle Reaktion'],2,'Stammkunden haben persönliche Präferenzen. Auf dem vollkommenen Markt gibt es keine Präferenzen.'],
+  ['Viele Anbieter treffen auf viele Nachfrager. Wie heißt diese Marktform?',['Monopol','Oligopol','Polypol','Duopol'],2,'Poly = viele. Das Polypol ist die Marktform des vollkommenen Markts.'],
+  ['42 Kisten werden nachgefragt, 75 gebacken. Wie nennt man diese Lage?',['Nachfrageüberhang','Angebotsüberhang','Gleichgewicht','Monopol'],1,'Das Angebot ist größer als die Nachfrage, also ein Angebotsüberhang (Käufermarkt). Die Preise geraten unter Druck.'],
+  ['Was passiert bei einem Nachfrageüberhang typischerweise mit dem Preis?',['Er sinkt','Er steigt','Er bleibt immer gleich','Er wird vom Staat festgelegt'],1,'Wenn die Ware knapp ist, können die Anbieter höhere Preise verlangen.'],
+  ['Wie viele verschiedene Preise gibt es auf einem vollkommenen Markt für dasselbe Gut?',['Für jeden Anbieter einen','Zwei: Groß- und Kleinhandel','Nur einen einheitlichen Preis','Das hängt vom Wetter ab'],2,'Gesetz der Unterschiedslosigkeit der Preise: Wer teurer ist, verliert sofort alle Kunden.'],
+  ['Welcher reale Markt kommt dem vollkommenen Markt am nächsten?',['Die Wertpapierbörse','Der Friseur um die Ecke','Der Wohnungsmarkt in München','Ein Restaurant'],0,'An der Börse sind die Güter (z. B. eine bestimmte Aktie) gleich, die Preise transparent, und die Reaktionen erfolgen in Sekunden.'],
+  ['Ein einziger Anbieter, viele Nachfrager. Welche Marktform ist das?',['Angebotsmonopol','Nachfragemonopol','Polypol','Zweiseitiges Monopol'],0,'Ein Anbieter = Angebotsmonopol. Er kann den Preis weitgehend selbst bestimmen.']
+];
+function vQuiz(){
+  const A=S.quiz||(S.quiz={});
+  const done=Object.keys(A).length,right=Object.entries(A).filter(([q,a])=>QUIZ[q][2]===a).length;
+  const qs=QUIZ.map((q,i)=>{
+    const a=A[i],ans=a!==undefined;
+    return `<div class="sub" style="margin-bottom:12px"><b>${i+1}. ${q[0]}</b>
+      ${q[1].map((o,j)=>`<button class="qopt ${ans&&j===q[2]?'right':''} ${ans&&j===a&&a!==q[2]?'wrong':''}" data-a="quiz" data-i="${i}" data-j="${j}" ${ans?'disabled':''}>${String.fromCharCode(65+j)}) ${o}</button>`).join('')}
+      ${ans?`<div class="qexp">${a===q[2]?'✅ <b>Richtig!</b>':'❌ <b>Nicht ganz.</b>'} ${q[3]}</div>`:''}</div>`;}).join('');
+  return `<span class="badge">✅ Quiz</span>
+  <h2>Habt ihr den Markt <span class="grad">verstanden?</span></h2>
+  <div class="pills"><span class="pill">${right} von ${QUIZ.length} richtig</span><span class="pill l">${done}/${QUIZ.length} beantwortet</span></div>
+  ${qs}
+  <div class="row"><button class="btn ghost" data-a="quizreset">↺ Quiz zurücksetzen</button></div>`;
+}
+
+/* ---------- Render & Events ---------- */
+function render(){
+  document.body.classList.toggle('beamer',!!S.beamer);
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===S.tab));
+  let h='';
+  if(S.tab==='spiel')h=S.phase==='setup'?vSetup():S.phase==='input'?vInput():S.phase==='result'?vResult():vFinal();
+  else if(S.tab==='rechner')h=vCalc();
+  else if(S.tab==='theorie')h=vTheory();
+  else h=vQuiz();
+  $('#app').innerHTML=h;
+  if(S.tab==='rechner')calcUpdate();
+}
+
+function startGame(){
+  const c=S.cfg;
+  if(c.minP>=c.maxP||c.step<=0){alert('Bitte Mindest- und Höchstpreis prüfen.');return;}
+  c.minP=Math.max(c.step,Math.round(c.minP/c.step)*c.step);c.maxP=Math.round(c.maxP/c.step)*c.step;
+  S.firms=S.setupFirms.slice(0,c.nFirms).map((f,i)=>({name:f.name.trim()||('Firma '+(i+1)),type:f.type,color:f.color,capital:c.start}));
+  S.round=1;S.history=[];prepareRound();S.phase='input';save();render();
+}
+
+document.addEventListener('click',e=>{
+  const tb=e.target.closest('[data-tab]');
+  if(tb){S.tab=tb.dataset.tab;save();render();window.scrollTo({top:0,behavior:'smooth'});return;}
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const a=b.dataset.a,i=+b.dataset.i;
+  switch(a){
+    case'beamer':S.beamer=!S.beamer;save();render();break;
+    case'fullscreen':try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch(err){}break;
+    case'reset':if(confirm('Wirklich ein neues Spiel beginnen? Der aktuelle Spielstand geht verloren.')){const keep={cfg:S.cfg,setupFirms:S.setupFirms,beamer:S.beamer};S=fresh();Object.assign(S,keep);save();render();}break;
+    case'start':startGame();break;
+    case'allhuman':S.setupFirms.forEach(f=>f.type='mensch');save();render();break;
+    case'mixbots':{const t=['vorsichtig','aggressiv','nachahmer','zufall'];S.setupFirms.forEach((f,k)=>f.type=k<2?'mensch':t[(k-2)%4]);save();render();break;}
+    case'tosetup':S.phase='setup';save();render();break;
+    case'qm':case'qp':{const d=S.pending.decisions[i];d.q=clampQ(d.q+(a==='qp'?1:-1),i);const inp=document.querySelector(`[data-f="qty"][data-i="${i}"]`);if(inp)inp.value=d.q;$('#hint'+i).innerHTML=hint(i);save();break;}
+    case'evaluate':evaluate();break;
+    case'undo':undoRound();break;
+    case'next':if(S.round>=S.cfg.rounds){S.phase='final';}else{S.round++;prepareRound();S.phase='input';}save();render();window.scrollTo({top:0,behavior:'smooth'});break;
+    case'replay':{const keep={cfg:S.cfg,setupFirms:S.setupFirms,beamer:S.beamer};S=fresh();Object.assign(S,keep);save();startGame();break;}
+    case'csv':exportCSV();break;
+    case'print':window.print();break;
+    case'reveal':S.theory[i]=!S.theory[i];b.classList.toggle('open');save();break;
+    case'revealall':MERKMALE.forEach((m,k)=>S.theory[k]=true);save();render();break;
+    case'hideall':S.theory={};save();render();break;
+    case'quiz':S.quiz[i]=+b.dataset.j;save();render();break;
+    case'quizreset':S.quiz={};save();render();break;
+  }
+});
+
+function onField(e,isChange){
+  const t=e.target,f=t.dataset.f;if(!f)return;
+  const i=+t.dataset.i;
+  if(f==='cfg'){
+    const k=t.dataset.k;let v=t.type==='checkbox'?t.checked:(t.dataset.num!==undefined?Number(t.value):t.value);
+    if(t.dataset.num!==undefined&&!isFinite(v))return;
+    S.cfg[k]=v;save();
+    if(t.dataset.rr!==undefined){if(isChange)render();}
+    else{const r=$('#rules');if(r)r.innerHTML=rulesHTML();}
+  }else if(f==='fname'){S.setupFirms[i].name=t.value;save();}
+  else if(f==='ftype'){S.setupFirms[i].type=t.value;save();}
+  else if(f==='price'){S.pending.decisions[i].p=Number(t.value);$('#hint'+i).innerHTML=hint(i);save();}
+  else if(f==='qty'){S.pending.decisions[i].q=t.value===''?0:Number(t.value);if(isChange){S.pending.decisions[i].q=clampQ(S.pending.decisions[i].q,i);t.value=S.pending.decisions[i].q;}$('#hint'+i).innerHTML=hint(i);save();}
+  else if(f==='vol'){S.pending.vol=Math.max(0,Number(t.value)||0);save();}
+  else if(f==='calc'){
+    const k=t.dataset.k;S.calc[k]=Math.max(0,Number(t.value)||0);
+    if(k==='q')S.calc.q=Math.min(S.calc.q,S.cfg.maxQty);
+    save();calcUpdate();
+  }
+}
+document.addEventListener('input',e=>onField(e,false));
+document.addEventListener('change',e=>onField(e,true));
+
+function exportCSV(){
+  const F=S.firms,rows=[['Runde','Firma','Preis','Gebacken','Auftraege','Ausweichkaeufe','Verkauft','Weggeworfen','Umsatz','Kosten','Gewinn','Kapital','Marktvolumen']];
+  S.history.forEach(h=>h.res.forEach((r,i)=>rows.push([h.round,F[i].name,r.p,r.q,r.orders,r.spill,r.sold,r.waste,r.revenue,r.costs,r.profit,r.capAfter,h.vol])));
+  const csv='﻿'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='Kuchenmarkt_Ergebnisse.csv';document.body.appendChild(a);a.click();a.remove();
+}
+
+render();
+</script>
+</body>
+</html>
